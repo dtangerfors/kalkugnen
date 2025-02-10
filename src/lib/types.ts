@@ -6,7 +6,7 @@ import { User as ClerkUser } from "@clerk/backend";
 export type ExtendedUser = {
   id: string;
   user_color: string;
-  user_role: $Enums.user_role_type | null;
+  user_role: $Enums.user_role_type;
   family_id: string | null;
   clerkUser: ClerkUser;
   family?: Family;

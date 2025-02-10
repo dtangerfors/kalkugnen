@@ -9,7 +9,7 @@ export function UserDialog({ user, families }: { user: ExtendedUser, families: F
   const values = {
     user_id: user.id,
     user_role: user.user_role,
-    family_id: user.family_id,
+    family_id: user.family_id!,
   }
   return (
     <Dialog>

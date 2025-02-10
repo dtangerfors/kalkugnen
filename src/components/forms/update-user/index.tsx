@@ -19,13 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Family } from "@prisma/client";
+import { Family, user_role_type } from "@prisma/client";
 import { Button } from "@/components/ui/button-primary";
 import { updateUserData } from "./action";
 
 export const formSchema = z.object({
   user_id: z.string(),
-  user_role: z.enum(["user", "admin", "super_admin", "moderator"]),
+  user_role: z.nativeEnum(user_role_type),
   family_id: z.string().optional(),
 });
 
@@ -40,7 +40,7 @@ export function UpdateUserForm({
   values,
   families,
 }: {
-  values?: Partial<z.infer<typeof formSchema>>;
+  values: z.infer<typeof formSchema>;
   families: Family[];
 }) {
   const form = useForm<z.infer<typeof formSchema>>({
