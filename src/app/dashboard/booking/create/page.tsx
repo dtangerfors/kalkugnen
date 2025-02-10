@@ -11,7 +11,7 @@ export default async function CreateBookingPage() {
   return (
     <>
     {isMobile && <FixedHeader label={"Skapa ny bokning"} invisibleFromStart />}
-    <div className="lg:p-6 max-lg:pb-24">
+    <div className="pt-safe-top lg:p-6 max-lg:pb-24">
       <header className="max-w-screen-sm mx-auto p-6 lg:pt-20">
           <Typography level="h1" variant="xl" color="text-black">Skapa ny bokning</Typography>
       </header>

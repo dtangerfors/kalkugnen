@@ -46,6 +46,7 @@ export default function NotificationDialog() {
       const date = new Date();
       date.setFullYear(date.getFullYear() + 1);
       setCookie(COOKIE_NAME, 'dontShow', { expires: date }); // Set cookie for a year
+      setDialogOpen(false);
   };
 
   const handleAcceptClick = () => {

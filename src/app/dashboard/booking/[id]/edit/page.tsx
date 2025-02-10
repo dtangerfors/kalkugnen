@@ -13,7 +13,7 @@ export default async function UpdateBookingPage(props: { params: Promise<{ id: s
   return (
       <>
       {isMobile && <FixedHeader label={"Uppdatera bokning"} invisibleFromStart />}
-      <div className="lg:p-6 max-lg:pb-24">
+      <div className="pt-safe-top lg:p-6 max-lg:pb-24">
         <header className="max-w-screen-sm mx-auto p-6 lg:pt-20">
             <Typography level="h1" variant="xl" color="text-black">Uppdatera bokning</Typography>
         </header>

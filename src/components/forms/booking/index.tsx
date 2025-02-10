@@ -105,7 +105,7 @@ export type BookingFormValues = {
   user_id: string;
   created_at?: number;
   updated_at?: number;
-} & z.infer<typeof formSchema>
+} & Partial<z.infer<typeof formSchema>>;
 
 export function BookingForm({bookingValues, isUpdatingBooking, isCreatingNewBooking}: {bookingValues?: BookingFormValues; isUpdatingBooking?: boolean; isCreatingNewBooking?: boolean;}) {
   const [open, setOpen] = useState(false);
