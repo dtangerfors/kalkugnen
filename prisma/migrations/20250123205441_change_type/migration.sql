@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Booking" ALTER COLUMN "created_at" SET DATA TYPE BIGINT,
+ALTER COLUMN "updated_at" SET DATA TYPE BIGINT;

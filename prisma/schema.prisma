@@ -1,0 +1,96 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("POSTGRES_PRISMA_URL")
+  directUrl  = env("POSTGRES_URL_NON_POOLING")
+  extensions = [uuidOssp(map: "uuid-ossp")]
+}
+
+model bookings {
+  id              String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  created_at      BigInt
+  updated_at      BigInt
+  user            users    @relation(fields: [user_id], references: [id])
+  user_id         String   @db.Uuid
+  name            String   @db.VarChar(255)
+  travel_dates    Json
+  arrival         DateTime @default(now()) @db.Date
+  departure       DateTime @default(now()) @db.Date
+  guests          Int
+  guests_children Int?
+  rooms           String[]
+  message         String?
+  is_canceled     Boolean? @default(false)
+}
+
+model users {
+  id          String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name        String          @db.VarChar(255)
+  email       String          @unique
+  user_color  String          @db.VarChar(255)
+  user_role   user_role_type? @default(user)
+  given_name  String?         @db.VarChar(255)
+  family_name String?         @db.VarChar(255)
+  family_id   String?         @db.Uuid
+  bookings    bookings[]
+}
+
+enum user_role_type {
+  super_admin
+  admin
+  moderator
+  user
+}
+
+model AppUser {
+  id         String          @id
+  user_role  user_role_type? @default(user)
+  avatar     Avatar?
+  family_id  String?        
+  bookings   Booking[]
+  family     Family? @relation(fields: [family_id], references: [id])
+  user_color String
+}
+
+model Avatar {
+  id         String  @id @default(uuid())
+  user       AppUser @relation(fields: [user_id], references: [id])
+  user_id    String  @unique
+  skinColor  String
+  earSize    String
+  hairColor  String
+  hairStyle  String
+  eyeStyle   String
+  noseStyle  String
+  mouthStyle String
+  shirtStyle String
+  shirtColor String
+  bgColor    String
+}
+
+model Booking {
+  id              String   @id @default(uuid())
+  created_at      BigInt
+  updated_at      BigInt
+  user            AppUser  @relation(fields: [user_id], references: [id])
+  user_id         String
+  booking_name    String?
+  name            String
+  arrival         DateTime @default(now()) @db.Date
+  departure       DateTime @default(now()) @db.Date
+  guests          Int
+  guests_children Int?
+  rooms           String[]
+  message         String?
+  is_canceled     Boolean? @default(false)
+}
+
+model Family {
+  id         String   @id @default(uuid())
+  family_name String
+  members     AppUser[]
+}

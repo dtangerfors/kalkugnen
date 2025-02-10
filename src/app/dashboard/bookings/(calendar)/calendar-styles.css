@@ -1,0 +1,155 @@
+.rbc-calendar {
+   @apply relative flex flex-col;
+}
+
+body:not(.app-mobile) .rbc-calendar {
+   @apply h-[calc(100vh-10rem-3px)] overflow-hidden;
+} 
+
+/* Navigation */
+.rbc-toolbar {
+   @apply flex justify-between items-center mb-4;
+}
+
+.rbc-btn-group:last-child {
+   @apply hidden;
+}
+
+.rbc-toolbar-label {
+   @apply text-base font-medium text-foreground capitalize;
+}
+
+.rbc-btn-group {
+   @apply flex gap-1; 
+}
+
+.rbc-btn-group button {
+   @apply rounded-3xl border-2 text-base font-semibold py-1 px-3 leading-none transition-all duration-300 bg-white border-gray-50 text-black hover:bg-gray-100 hover:border-gray-100 active:bg-gray-200 active:border-gray-200;
+}
+
+.app-mobile .rbc-toolbar {
+   @apply absolute -bottom-px w-full bg-background pt-5 px-6 mb-0 rounded-t-2xl;
+}
+
+.app-mobile .rbc-btn-group {
+   @apply w-full;
+}
+
+.app-mobile .rbc-btn-group button {
+   @apply first:mr-auto;
+}
+
+.app-mobile .rbc-toolbar-label {
+   @apply hidden;
+}
+
+/* View */
+.rbc-month-view {
+   @apply flex-1 flex flex-col;
+}
+
+.app-mobile .rbc-month-view {
+   @apply mx-4 mb-20 block;
+}
+
+/* Header Row */
+.rbc-month-header {
+   @apply flex;
+}
+
+.rbc-header {
+   @apply flex-1 py-1 text-center text-xs text-foreground font-medium uppercase;
+}
+
+/* Month Row */
+.rbc-month-row {
+   @apply flex flex-col flex-1 relative border-x border-b border-gray-100;
+}
+
+.app-mobile .rbc-month-row {
+   @apply h-14 border-none;
+}
+
+.app-mobile .rbc-day-bg+.rbc-day-bg {
+   @apply border-none;
+}
+
+.rbc-month-row:nth-child(2) {
+   @apply border-t rounded-t-lg;
+}
+
+.rbc-month-row:last-child {
+   @apply rounded-b-lg;
+}
+
+.rbc-row-content {
+   @apply relative;
+}
+
+.rbc-row {
+   @apply flex;
+}
+
+.rbc-row-bg {
+   @apply absolute inset-0 flex flex-1;
+}
+
+/* Date */
+.rbc-date-cell {
+   @apply flex-1 text-right p-1;
+}
+
+.rbc-button-link {
+   @apply w-8 h-8 lg:w-6 lg:h-6 rounded-full grid place-items-center mx-auto lg:mr-0 lg:ml-auto font-medium text-xs text-black leading-none hover:bg-gray-200;
+}
+
+.rbc-now .rbc-button-link {
+   @apply bg-primary-300;
+}
+
+.rbc-day-bg {
+   @apply flex-1;
+}
+
+.rbc-day-bg+.rbc-day-bg {
+   @apply border-l border-gray-100;
+}
+
+/* Off Range */
+.rbc-off-range .rbc-button-link {
+   @apply text-gray-300;
+}
+
+/* Event */
+.rbc-row-segment {
+   @apply mb-1;
+}
+
+.app-mobile .rbc-row-segment {
+   @apply mb-0.5;
+}
+
+.rbc-event {
+   @apply rounded-md h-1;
+}
+
+.rbc-event-continues-after {
+   @apply rounded-r-none ml-1 -mr-4;
+}
+
+.rbc-event-continues-prior {
+   @apply rounded-l-none mr-1 -ml-4;
+}
+
+.rbc-event-continues-prior.rbc-event-continues-after {
+   @apply rounded-none -mx-4 lg:mx-0;
+}
+
+.rbc-event-continues-prior.rbc-event-continues-after .event-title, 
+.rbc-event-continues-prior .event-title {
+   @apply hidden;
+} 
+
+.rbc-event-content {
+   @apply hidden text-xs text-black sr-only md:not-sr-only dark:text-white;
+}
