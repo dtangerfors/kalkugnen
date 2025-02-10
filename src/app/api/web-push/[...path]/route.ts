@@ -1,3 +1,5 @@
+"use server"
+
 import webpush from 'web-push';
 
 webpush.setVapidDetails(
@@ -6,7 +8,7 @@ webpush.setVapidDetails(
   process.env.VAPID_PRIVATE_KEY || '',
 );
 
-let subscription: PushSubscription;
+let subscription: webpush.PushSubscription;
 
 export async function POST(request: Request) {
   const { pathname } = new URL(request.url);
@@ -21,7 +23,7 @@ export async function POST(request: Request) {
 }
 
 async function setSubscription(request: Request) {
-  const body: { subscription: PushSubscription } = await request.json();
+  const body: { subscription: webpush.PushSubscription } = await request.json();
   subscription = body.subscription;
   return new Response(JSON.stringify({ message: 'Subscription set.' }), {});
 }
