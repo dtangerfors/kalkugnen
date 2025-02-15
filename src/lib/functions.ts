@@ -71,7 +71,11 @@ export const getRoomName = (bookedRooms: string[]) => {
 
 export function getRawColor(color: ColorType) {
 
-  if (color === "coral") return "#f99585";
-  if (color === "sky") return "#86b6f9";
-  if (color === "sun") return "#f9ee85";
+  if (color === "lilac") return "#e9b4f3";
+  if (color === "sky") return "#9fc4f1";
+  if (color === "sun") return "#e7cc62";
+  if (color === "poppy") return "#f4adad";
+  if (color === "jaffa") return "#edbe84";
+  if (color === "ivy") return "#b5e076";
+  if (color === "water") return "#75d0eb";
 }

@@ -1,12 +1,3 @@
-'use client';
-import { useEffect, useState } from 'react';
-import { setCookie, getCookie } from 'cookies-next';
-import {
-  checkPermissionStateAndAct,
-  notificationUnsupported,
-  registerAndSubscribe
-} from '@/app/Push';
-
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,44 +9,18 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 
-const COOKIE_NAME = 'allowNotifications';
+interface Props {
+	onSubscribe: () => void;
+	onCancel: () => void;
+	onDontAsk: () => void;
+}
 
-export default function NotificationDialog() {
-  const [unsupported, setUnsupported] = useState<boolean>(false);
-  const [subscription, setSubscription] = useState<PushSubscription | null>(null);
-  const [dialogOpen, setDialogOpen] = useState<boolean>(false);
+export default function NotificationDialog(props: Props) {
+  const { onSubscribe, onCancel, onDontAsk } = props;
 
-  useEffect(() => {
-    const isUnsupported = notificationUnsupported();
-    setUnsupported(isUnsupported);
-    if (isUnsupported) {
-      return;
-    }
-    checkPermissionStateAndAct(setSubscription);
-  }, []);
-
-  useEffect(() => {
-    const allowNotificationsCookie = getCookie(COOKIE_NAME);
-    if (allowNotificationsCookie !== 'dontShow') {
-      setDialogOpen(true);
-    }
-  }, []);
-
-  const doNotShowAgain = () => {
-      // Create date 1 year from now
-      const date = new Date();
-      date.setFullYear(date.getFullYear() + 1);
-      setCookie(COOKIE_NAME, 'dontShow', { expires: date }); // Set cookie for a year
-      setDialogOpen(false);
-  };
-
-  const handleAcceptClick = () => {
-    registerAndSubscribe(setSubscription);
-    doNotShowAgain();
-  }
 
   return (
-  <AlertDialog open={dialogOpen}>
+  <AlertDialog open={true}>
     <AlertDialogContent>
       <AlertDialogHeader>
         <AlertDialogTitle>Tillåt notifikationer</AlertDialogTitle>
@@ -64,8 +29,9 @@ export default function NotificationDialog() {
         </AlertDialogDescription>
       </AlertDialogHeader>
       <AlertDialogFooter>
-        <AlertDialogCancel onClick={doNotShowAgain}>Avbryt</AlertDialogCancel>
-        <AlertDialogAction disabled={unsupported} onClick={handleAcceptClick}>Godkänn</AlertDialogAction>
+        <AlertDialogCancel onClick={onDontAsk}>Fråga inte igen</AlertDialogCancel>
+        <AlertDialogCancel onClick={onCancel}>Avbryt</AlertDialogCancel>
+        <AlertDialogAction onClick={onSubscribe}>Godkänn</AlertDialogAction>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>

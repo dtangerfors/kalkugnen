@@ -94,3 +94,8 @@ model Family {
   family_name String
   members     AppUser[]
 }
+
+model PushSubscription {
+  device_id String @id @default(uuid())
+  value Json
+}

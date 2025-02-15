@@ -52,6 +52,9 @@ import {
 } from "@/components/ui/drawer";
 import { useAppContext } from "@/app/dashboard/app-context";
 import { createBooking, updateBooking } from "./action";
+import { usePushNotifications } from "@/lib/client/notifications/provider";
+import { sendPushNotification } from "@/lib/client/notifications/actions";
+import { showNiceDates } from "@/lib/functions";
 
 const DialogComp = {
   Wrapper: Dialog,
@@ -112,6 +115,7 @@ export function BookingForm({bookingValues, isUpdatingBooking, isCreatingNewBook
   const { selectedDate } = useAppContext();
   const { toast } = useToast();
   const router = useRouter();
+  const push = usePushNotifications();
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   const Comp = isDesktop ? DialogComp : DrawerComp;
@@ -135,37 +139,6 @@ export function BookingForm({bookingValues, isUpdatingBooking, isCreatingNewBook
       message: bookingValues?.message || "",
     },
   });
-
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    const fullBooking = {
-      ...values,
-      id: bookingValues?.id,
-      user_id: bookingValues?.user_id || "",
-      created_at: bookingValues?.created_at,
-      updated_at: bookingValues?.updated_at,
-    }
-   if (isCreatingNewBooking) {
-    createBooking(fullBooking);
-   } else {
-    try {
-      updateBooking(fullBooking);
-    } 
-    catch {
-      toast({
-        title: "Något gick fel",
-        description: "På grund av ett fel kunde din bokning inte uppdateras. Försök igen senare.",
-      });
-    }
-    finally {
-      toast({
-        title: "Boking uppdaterad",
-        description: "Din bokning har uppdaterats.",
-      });
-      router.push(`/dashboard/profile`);
-    }
-   }
-  }
-
   const submitButtonLabel = isUpdatingBooking ? "Uppdatera bokning" : "Lägg in bokning";
 
   return (
@@ -397,4 +370,61 @@ export function BookingForm({bookingValues, isUpdatingBooking, isCreatingNewBook
       </form>
     </Form>
   );
+
+  function onSubmit(values: z.infer<typeof formSchema>) {
+    const fullBooking = {
+      ...values,
+      id: bookingValues?.id,
+      user_id: bookingValues?.user_id || "",
+      created_at: bookingValues?.created_at,
+      updated_at: bookingValues?.updated_at,
+    }
+   if (isCreatingNewBooking) {
+    try {
+      createBooking(fullBooking);
+    } catch {
+      toast({
+        title: "Något gick fel",
+        description: "På grund av ett fel kunde din bokning inte skapas. Försök igen senare.",
+      });
+    }
+    finally {
+      sendNotification(values)
+    }
+   } else {
+    try {
+      updateBooking(fullBooking);
+    } 
+    catch {
+      toast({
+        title: "Något gick fel",
+        description: "På grund av ett fel kunde din bokning inte uppdateras. Försök igen senare.",
+      });
+    }
+    finally {
+      toast({
+        title: "Boking uppdaterad",
+        description: "Din bokning har uppdaterats.",
+      });
+      router.push(`/dashboard/profile`);
+    }
+   }
+  }
+
+  async function sendNotification(values: z.infer<typeof formSchema>) {
+    if (!push.isSubscribed || !push.deviceId) {
+			return;
+		}
+
+    const message = `${values.name} bokade resa ${showNiceDates(values.dates.from, values.dates.to).withYear}`
+
+    console.log('Sending message:', message);
+    
+    await sendPushNotification({
+      deviceId: push.deviceId,
+      title: 'Ny bokning',
+      body: message,
+      url: 'https://stenbrottsvagen.se',
+    });
+  }
 }

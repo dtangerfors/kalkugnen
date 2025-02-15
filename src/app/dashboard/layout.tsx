@@ -3,7 +3,7 @@ import { MobileNav } from "@/components/dashboard/mobile-nav";
 import clsx from "clsx";
 import AppProvider from "./app-context";
 import { Toaster } from "@/components/ui/toaster"
-import NotificationDialog from "@/components/pwa/notification-dialog";
+import { PushNotificationsProvider } from "@/lib/client/notifications/provider";
 
 export default async function DashboardLayout({
   children,
@@ -13,6 +13,7 @@ export default async function DashboardLayout({
 
   return (
     <AppProvider>
+      <PushNotificationsProvider>
       <div className="flex min-h-dvh bg-background">
         <div className={clsx(
           "fixed bottom-0 left-0 z-20 w-full bg-white px-6 pb-safe-bottom",
@@ -28,7 +29,7 @@ export default async function DashboardLayout({
         <main className="flex-1 lg:ml-72">{children}</main>
       </div>
       <Toaster />
-      <NotificationDialog />
+      </PushNotificationsProvider>
     </AppProvider>
   );
 }
