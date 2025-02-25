@@ -122,3 +122,34 @@ export async function cancelBooking(id: string) {
     return { message: 'Database Error: Kunde inte genomföra avbokning.' };
   }
 }
+
+export async function fetchBooking(id: string) {
+  const booking = await prisma.booking.findUnique({
+    where: {
+      id: id
+    }
+  });
+
+  if (!booking) {
+    throw new Error('Booking not found');
+  }
+
+  const bookingValues = {
+    id: booking.id,
+    booking_name: booking.booking_name as string | undefined,
+    name: booking.name,
+    guests: booking.guests.toString(),
+    guests_children: booking.guests_children?.toString(),
+    rooms: booking.rooms,
+    dates: {
+      from: new Date(booking.arrival),
+      to: new Date(booking.departure)
+    },
+    message: booking.message as string | undefined,
+    user_id: booking.user_id,
+    created_at: Number(booking.created_at),
+    updated_at: Number(booking.updated_at)
+  }
+
+  return bookingValues
+}

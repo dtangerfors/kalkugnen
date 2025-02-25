@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import { z } from "zod";
+import { v4 as uuidv4 } from 'uuid';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon } from "lucide-react";
+import { CalendarIcon, Loader2 } from "lucide-react";
 import { addDays, format } from "date-fns";
 import { useRouter } from "next/navigation";
 
@@ -110,8 +111,9 @@ export type BookingFormValues = {
   updated_at?: number;
 } & Partial<z.infer<typeof formSchema>>;
 
-export function BookingForm({bookingValues, isUpdatingBooking, isCreatingNewBooking}: {bookingValues?: BookingFormValues; isUpdatingBooking?: boolean; isCreatingNewBooking?: boolean;}) {
+export function BookingForm({bookingValues, email, isUpdatingBooking, isCreatingNewBooking}: {bookingValues?: BookingFormValues; email: string | undefined; isUpdatingBooking?: boolean; isCreatingNewBooking?: boolean;}) {
   const [open, setOpen] = useState(false);
+  const [isSending, setIsSending] = useState(false);
   const { selectedDate } = useAppContext();
   const { toast } = useToast();
   const router = useRouter();
@@ -274,7 +276,7 @@ export function BookingForm({bookingValues, isUpdatingBooking, isCreatingNewBook
                     </Button>
                   </FormControl>
                 </Comp.Trigger>
-                <Comp.Content className="w-auto">
+                <Comp.Content className="w-auto pb-safe-bottom items-center">
                   <Comp.Header className="text-left">
                     <Comp.Title>Välj datum</Comp.Title>
                     <Comp.Description>
@@ -366,7 +368,9 @@ export function BookingForm({bookingValues, isUpdatingBooking, isCreatingNewBook
             </FormItem>
           )}
         />
-        <Button className="w-full" type="submit">{submitButtonLabel}</Button>
+        <Button disabled={isSending} className="w-full" type="submit">
+          {isSending ? <Loader2 className="animate-spin" /> : submitButtonLabel}
+          </Button>
       </form>
     </Form>
   );
@@ -374,49 +378,55 @@ export function BookingForm({bookingValues, isUpdatingBooking, isCreatingNewBook
   function onSubmit(values: z.infer<typeof formSchema>) {
     const fullBooking = {
       ...values,
-      id: bookingValues?.id,
+      id: bookingValues?.id || uuidv4(),
       user_id: bookingValues?.user_id || "",
       created_at: bookingValues?.created_at,
       updated_at: bookingValues?.updated_at,
     }
    if (isCreatingNewBooking) {
     try {
-      createBooking(fullBooking);
+      createBooking(fullBooking, email);
+      setIsSending(true);
     } catch {
       toast({
         title: "Något gick fel",
         description: "På grund av ett fel kunde din bokning inte skapas. Försök igen senare.",
       });
+      setIsSending(false);
     }
     finally {
-      sendNotification(values)
+      sendNotification(fullBooking)
+      setIsSending(false);
     }
    } else {
     try {
       updateBooking(fullBooking);
+      setIsSending(true);
     } 
     catch {
       toast({
         title: "Något gick fel",
         description: "På grund av ett fel kunde din bokning inte uppdateras. Försök igen senare.",
       });
+      setIsSending(false);
     }
     finally {
       toast({
         title: "Boking uppdaterad",
         description: "Din bokning har uppdaterats.",
       });
+      setIsSending(false);
       router.push(`/dashboard/profile`);
     }
    }
   }
 
-  async function sendNotification(values: z.infer<typeof formSchema>) {
+  async function sendNotification(values: BookingFormValues) {
     if (!push.isSubscribed || !push.deviceId) {
 			return;
 		}
 
-    const message = `${values.name} bokade resa ${showNiceDates(values.dates.from, values.dates.to).withYear}`
+    const message = `${values.name} bokade resa ${showNiceDates(values.dates?.from as Date, values.dates?.to as Date).withYear}`
 
     console.log('Sending message:', message);
     
@@ -424,7 +434,7 @@ export function BookingForm({bookingValues, isUpdatingBooking, isCreatingNewBook
       deviceId: push.deviceId,
       title: 'Ny bokning',
       body: message,
-      url: 'https://stenbrottsvagen.se',
+      url: `https://stenbrottsvagen.se/dashboard/booking/${values.id}`,
     });
   }
 }

@@ -18,7 +18,7 @@ export default async function CreateBookingPage() {
       <section>
         <div className="max-w-screen-sm mx-auto rounded-t-3xl lg:rounded-md overflow-hidden">
         <div className="bg-white p-6">
-        <BookingForm isCreatingNewBooking bookingValues={{
+        <BookingForm isCreatingNewBooking email={user?.primaryEmailAddress?.emailAddress} bookingValues={{
           name: user?.fullName as string,
           user_id: user?.id as string,
         }} />

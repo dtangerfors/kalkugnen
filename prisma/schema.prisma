@@ -97,5 +97,6 @@ model Family {
 
 model PushSubscription {
   device_id String @id @default(uuid())
+  user_id String
   value Json
 }

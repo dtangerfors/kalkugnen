@@ -4,8 +4,9 @@ import { BookingFormValues } from ".";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
+import { sendEmail } from "@/app/api/emails/sendEmail";
 
-export async function createBooking(values: BookingFormValues) {
+export async function createBooking(values: BookingFormValues, email: string | undefined) {
   const {
     booking_name,
     name,
@@ -16,6 +17,10 @@ export async function createBooking(values: BookingFormValues) {
     message,
     user_id,
   } = values;
+
+  const created_at = Date.now();
+  const updated_at = Date.now();
+
   await prisma.booking.create({
     data: {
       user_id,
@@ -27,10 +32,23 @@ export async function createBooking(values: BookingFormValues) {
       departure: dates!.to,
       arrival: dates!.from,
       message,
-      created_at: parseInt(Date.now().toString()),
-      updated_at: parseInt(Date.now().toString()),
+      created_at: parseInt(created_at.toString()),
+      updated_at: parseInt(updated_at.toString()),
     },
   });
+
+  try {
+    if (!email) return;
+    await sendEmail({
+      booking: {
+        ...values
+      },
+      email
+    });
+  } catch (emailError) {
+    console.error('Failed to send confirmation email:', emailError);
+    // Continue with the booking process even if email fails
+  }
 
   redirect("/dashboard/booking/completed");
 }

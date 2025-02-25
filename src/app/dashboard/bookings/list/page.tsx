@@ -4,6 +4,7 @@ import { getDeviceType } from "@/lib/server-utils";
 import { BookingsFixedHeader } from "../bookings-header";
 import { cn, getMonthTitle, groupBookingsByMonth } from "@/lib/utils";
 import { Typography } from "@/components/ui/typography";
+import { NavSwitch } from "@/components/dashboard/nav-switch";
 
 export default async function BookingsListPage() {
   const { isMobile } = await getDeviceType(); 
@@ -21,13 +22,22 @@ export default async function BookingsListPage() {
     });
   
   const sortedBookings = await groupBookingsByMonth(bookings);
+  const links = [
+    {href: "/dashboard/bookings", label: "Kalender"},
+    {href: "/dashboard/bookings/list", label: "Lista"},
+  ]
   
   return (
     <>
     {isMobile && (
       <BookingsFixedHeader label="Alla bokningar" />
     )}
-    <div className={cn("p-6", isMobile && "mt-20 pt-safe-top")}>
+    {!isMobile && 
+      <div className="flex justify-center w-full p-4">
+        <NavSwitch links={links} />
+      </div>
+    }
+    <div className={cn("p-6 max-w-screen-sm mx-auto max-lg:pb-[6.5rem]", isMobile && "mt-20 pt-safe-top")}>
       {Object.entries(sortedBookings).map(([month, bookings]) => (
       <div key={month} className="mb-6 first:pt-6">
         <div className="flex justify-between mb-4 ml-4">

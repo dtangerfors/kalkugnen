@@ -1,6 +1,7 @@
 'use server';
 
 import { prisma } from "@/lib/prisma";
+import { currentUser } from '@clerk/nextjs/server'
 import webpush, { PushSubscription } from 'web-push';
 
 interface I_SubscribeUser {
@@ -9,12 +10,16 @@ interface I_SubscribeUser {
 }
 
 export async function subscribeUser(props: I_SubscribeUser) {
+	const user = await currentUser()
 	const { sub, deviceId } = props;
+
+	if (!user?.id) return;
 
 	try {
 		const subscribe = await prisma.pushSubscription.create({
 			data: {
 				device_id: deviceId,
+				user_id: user?.id,
 				value: JSON.stringify(sub),
 			}
 		})

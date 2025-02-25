@@ -7,6 +7,7 @@ import { BookingsInView } from "./bookings-in-view";
 import { BookingEventSkeleton, CalendarSkeleton } from "@/components/skeletons";
 import { prisma } from "@/lib/prisma";
 import { BookingsFixedHeader } from "../bookings-header";
+import { NavSwitch } from "@/components/dashboard/nav-switch";
 
 export default async function CalendarPage() {
   const { isMobile } = await getDeviceType(); 
@@ -21,6 +22,11 @@ export default async function CalendarPage() {
     },
   });
 
+  const links = [
+    {href: "/dashboard/bookings", label: "Kalender"},
+    {href: "/dashboard/bookings/list", label: "Lista"},
+  ]
+
   return (
     <CalendarProvider bookings={bookings}>
       <div className={clsx(isMobile && "flex flex-col h-full bg-gradient-to-b from-white from-25% to-25% to-background")}>
@@ -34,6 +40,11 @@ export default async function CalendarPage() {
             </Suspense>
 
             <div className={clsx("@container relative grow bg-background", !isMobile && "rounded-t-3xl @4xl:h-dvh @4xl:rounded-tr-none @4xl:rounded-l-3xl", isMobile && "pb-24")}>
+              {!isMobile && 
+                <div className="flex justify-center w-full p-4">
+                  <NavSwitch links={links} />
+                </div>
+              }
               <Suspense fallback={<BookingEventSkeleton />}>
                 <BookingsInView />
               </Suspense>
