@@ -25,7 +25,7 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   
   // If the user is logged in and on indexpage, redirect to dashboard
   if ((userId && isOnIndexPage(req))) {
-    const dashboardUrl = new URL('/dashboard/start', req.url)
+    const dashboardUrl = new URL('/dashboard', req.url)
     return NextResponse.redirect(dashboardUrl)
   }
 
