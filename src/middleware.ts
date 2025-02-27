@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server'
 
 const isOnboardingRoute = createRouteMatcher(['/onboarding']);
 const isOnIndexPage = createRouteMatcher(['/']);
-const isOnDashboardPage = createRouteMatcher(['/dashboard']);
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)', '/admin(.*)']);
 
 export default clerkMiddleware(async (auth, req: NextRequest) => {
@@ -25,7 +24,7 @@ export default clerkMiddleware(async (auth, req: NextRequest) => {
   }
   
   // If the user is logged in and on indexpage, redirect to dashboard
-  if ((userId && isOnIndexPage(req) || userId && isOnDashboardPage(req))) {
+  if ((userId && isOnIndexPage(req))) {
     const dashboardUrl = new URL('/dashboard/start', req.url)
     return NextResponse.redirect(dashboardUrl)
   }

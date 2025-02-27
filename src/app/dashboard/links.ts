@@ -32,7 +32,7 @@ const user: LinkArrProps = [
 ];
 
 export const navLinks: LinkArrProps = [
-  { name: "Hem", href: "/dashboard/start", icon: "house" },
+  { name: "Hem", href: "/dashboard", icon: "house" },
   { name: "Bokning", href: "/dashboard/booking/create", icon: "plus-circle"},
   { name: "Kalender", href: "/dashboard/bookings", icon: "calendar" },
   { name: "Profil", href: "/dashboard/profile", icon: "circle-user-round" },
