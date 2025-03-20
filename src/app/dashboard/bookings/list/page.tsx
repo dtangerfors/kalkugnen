@@ -18,6 +18,9 @@ export default async function BookingsListPage() {
             avatar: true
           }
         }
+      },
+      where: {
+        is_canceled: false
       }
     });
   

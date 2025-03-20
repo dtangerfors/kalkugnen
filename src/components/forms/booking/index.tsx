@@ -122,7 +122,6 @@ export function BookingForm({bookingValues, email, isUpdatingBooking, isCreating
 
   const Comp = isDesktop ? DialogComp : DrawerComp;
   const calendarMonthToShow = isDesktop ? 2 : 1;
-  const dateToday = new Date().toJSON().slice(0, 10);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -130,13 +129,10 @@ export function BookingForm({bookingValues, email, isUpdatingBooking, isCreating
       name: bookingValues?.name || "",
       guests: bookingValues?.guests?.toString() || "1",
       guests_children: bookingValues?.guests_children?.toString() || "",
-      dates: bookingValues?.dates || {
+      dates: bookingValues?.dates ?? (selectedDate ? {
         from: new Date(selectedDate),
         to: addDays(new Date(selectedDate), 7),
-      } || {
-        from: new Date(dateToday),
-        to: addDays(new Date(dateToday), 7),
-      },
+      } : undefined),
       rooms: bookingValues?.rooms || [],
       message: bookingValues?.message || "",
     },

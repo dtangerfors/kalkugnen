@@ -3,15 +3,14 @@
 import { createContext, useContext, useState } from "react"
 
 type AppContextProps = {
-  selectedDate: string;
-  setSelectedDate: React.Dispatch<React.SetStateAction<string>>;
+  selectedDate: string | undefined;
+  setSelectedDate: React.Dispatch<React.SetStateAction<string | undefined>>;
 }
 
 const AppContext = createContext<AppContextProps>({} as AppContextProps);
 
 export default function AppProvider({children}: {children: React.ReactNode}) {
-  const currentDate = new Date().toLocaleDateString();
-  const [selectedDate, setSelectedDate] = useState<string>(currentDate);
+  const [selectedDate, setSelectedDate] = useState<string>();
 
   return (
     <AppContext.Provider value={{selectedDate, setSelectedDate}}>

@@ -20,6 +20,9 @@ export default async function CalendarPage() {
         }
       }
     },
+    where: {
+      is_canceled: false
+    }
   });
 
   const links = [

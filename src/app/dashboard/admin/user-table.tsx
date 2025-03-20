@@ -11,6 +11,7 @@ import { ExtendedUser } from "@/lib/types";
 import { UserDialog } from "./dialog";
 import { Family } from "@prisma/client";
 
+
 export function UserTable({users, families}: {users: ExtendedUser[], families: Family[]}) {
   return (
     <div className="rounded-2xl bg-white p-4 pr-0 pt-0">

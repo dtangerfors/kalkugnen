@@ -3,6 +3,7 @@ import { UserTable } from "./user-table";
 import { Typography } from "@/components/ui/typography";
 import { clerkBackend } from "@/lib/clerk";
 import { prisma } from "@/lib/prisma";
+import { $Enums } from "@prisma/client";
 
 export default async function AdminPage() {
   const users = await getCombinedUserData();
@@ -32,9 +33,12 @@ async function getCombinedUserData() {
   const appUserData = await prisma.appUser.findMany({
     include: {
       family: true,
+    },
+    where: {
+      instance: process.env.NEXT_CLERK_INSTANCE as $Enums.clerk_instance
     }
   });
-  const clerkData = await clerkBackend.users.getUserList()
+  const clerkData = await clerkBackend.users.getUserList();
 
   return appUserData.map((user) => {
     const clerkUser = clerkData.data.find((clerkUser) => clerkUser.id === user.id);
