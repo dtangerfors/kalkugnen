@@ -12,7 +12,21 @@ import { Typography } from "@/components/ui/typography";
 
 export default async function StatisticsPage() {
   const { isMobile } = await getDeviceType();
-  const bookings = await prisma.bookings.findMany();
+  const bookings = await prisma.booking.findMany({
+    include: {
+      user: {
+        select: {
+          avatar: true,
+          user_color: true,
+        }
+      }
+    },
+    where: {
+      AND: [
+        { is_canceled: false }, // Exclude canceled bookings
+      ],
+    }
+  });
   const currentYear = new Date().getFullYear();
 
   return (
