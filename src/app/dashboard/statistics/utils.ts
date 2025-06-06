@@ -1,15 +1,13 @@
-import { Booking, SortedBooking } from "@/lib/types";
+import { SortedBooking, BookingData as Booking } from "@/lib/types";
 
 function thisYear(booking: Booking) {
-  const travel_dates = booking.travel_dates as {start: string, end: string}
-  const bookingCreated = new Date(travel_dates.start).getFullYear();
+  const bookingCreated = new Date(booking.arrival).getFullYear();
   const thisYear = new Date().getFullYear();
   return bookingCreated == thisYear;
 }
 
 function previousYear(booking: Booking) {
-  const travel_dates = booking.travel_dates as {start: string, end: string}
-  const bookingCreated = new Date(travel_dates.start).getFullYear();
+  const bookingCreated = new Date(booking.arrival).getFullYear();
   const previousYear = new Date().getFullYear() - 1;
   return bookingCreated == previousYear;
 }
@@ -28,7 +26,7 @@ function getTotalDaysThisYear(bookings: Booking[]) {
   const bookingsThisYear = bookings.filter(thisYear);
 
   bookingsThisYear.forEach(booking => {
-    const travel_dates = booking.travel_dates as {start: string, end: string}
+    const travel_dates = {start: booking.arrival.toString(), end: booking.departure.toString()};
     const daysForThisBooking = totalDays(travel_dates!.start, travel_dates!.end)
 
     totalDaysThisYear += daysForThisBooking
@@ -49,7 +47,7 @@ function sortBookingsByYear(bookings: Booking[]) {
   const bookingsByYear: SortedBooking = {};
 
   bookings.forEach((booking) => {
-    const travel_dates = booking.travel_dates as {start: string, end: string}
+    const travel_dates = {start: booking.arrival.toString(), end: booking.departure.toString()};
     const year = new Date(travel_dates.start).getFullYear();
 
     if (!bookingsByYear[year]) {

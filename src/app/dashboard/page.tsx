@@ -21,7 +21,7 @@ export default async function DashboardIndex() {
   const posts = await fetchPosts();
   const upcomingBookings = await getBookingsDueWithin30Days();
 
-  const bgImage = isMobile ? "/cover-hallshuk-mobile.jpg" : "/cover-hallshuk.jpg";
+  const bgImage = isMobile ? "/cover-vallmo-mobile.jpg" : "/cover-vallmo.jpg";
 
   return (
     <>
@@ -38,7 +38,7 @@ export default async function DashboardIndex() {
               alt="Ett grönt fält med blåeld"
               width={1920}
               height={1080}
-              className="h-full w-full object-cover object-top"
+              className="h-full w-full object-cover object-bottom"
             />
            <div className="fixed inset-0 h-full w-full bg-gradient-to-b from-black/30 from-[30rem] to-background to-[30rem]"></div>
           </figure>
