@@ -5,18 +5,15 @@ import { z } from "zod";
 import { v4 as uuidv4 } from 'uuid';
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CalendarIcon, Loader2 } from "lucide-react";
-import { addDays, format } from "date-fns";
+import { Loader2 } from "lucide-react";
+import { addDays } from "date-fns";
 import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { guests, rooms } from "@/lib/constants";
-import { useMediaQuery } from "@/hooks/use-media-query";
-import { cn } from "@/lib/utils";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar } from "@/components/ui/calendar";
 import { useToast } from "@/hooks/use-toast";
 
 import {
@@ -35,45 +32,12 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerDescription,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
+import { DatePicker } from "@/components/ui/date-picker";
 import { useAppContext } from "@/app/dashboard/app-context";
 import { createBooking, updateBooking } from "./action";
 import { usePushNotifications } from "@/lib/client/notifications/provider";
 import { sendPushNotification } from "@/lib/client/notifications/actions";
 import { showNiceDates } from "@/lib/functions";
-
-const DialogComp = {
-  Wrapper: Dialog,
-  Content: DialogContent,
-  Header: DialogHeader,
-  Title: DialogTitle,
-  Description: DialogDescription,
-  Trigger: DialogTrigger,
-};
-
-const DrawerComp = {
-  Wrapper: Drawer,
-  Content: DrawerContent,
-  Header: DrawerHeader,
-  Title: DrawerTitle,
-  Description: DrawerDescription,
-  Trigger: DrawerTrigger,
-};
 
 export const formSchema = z.object({
   booking_name: z.string().optional(),
@@ -84,24 +48,23 @@ export const formSchema = z.object({
     message: "Minst en vuxen person behöver anges.",
   }),
   guests_children: z.string().optional(),
-  dates: z
-    .object({
-      from: z.date(),
-      to: z.date(),
-    })
-    .superRefine((data, ctx) => {
-      if (data.from === undefined || data.to === undefined) {
-        return ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          message: "Du måste välja ett start- och slutdatum.",
-        });
-      }
-      return data;
-    }),
+  from: z.date({
+  required_error: "Du måste välja ett startdatum.",
+  invalid_type_error: "Ogiltigt startdatum.",
+}),
+  to: z.date({
+    required_error: "Du måste välja ett slutdatum.",
+    invalid_type_error: "Ogiltigt slutdatum.",
+  }),
   rooms: z.array(z.string()).refine((value) => value.some((item) => item), {
     message: "Du måste välja minst ett rum.",
   }),
   message: z.string().max(1000).optional(),
+  is_rented_out: z.boolean().optional(),
+  is_test_booking: z.boolean().optional(),
+}).refine((data) => data.to > data.from, {
+  message: "Slutdatumet måste vara efter startdatumet.",
+  path: ["to"],
 });
 
 export type BookingFormValues = {
@@ -109,19 +72,21 @@ export type BookingFormValues = {
   user_id: string;
   created_at?: number;
   updated_at?: number;
+  dates?: {
+    from: Date;
+    to: Date;
+  }
 } & Partial<z.infer<typeof formSchema>>;
 
+const isDevelopment = process.env.NODE_ENV === 'development';
+
 export function BookingForm({bookingValues, email, isUpdatingBooking, isCreatingNewBooking}: {bookingValues?: BookingFormValues; email: string | undefined; isUpdatingBooking?: boolean; isCreatingNewBooking?: boolean;}) {
-  const [open, setOpen] = useState(false);
   const [isSending, setIsSending] = useState(false);
   const { selectedDate } = useAppContext();
   const { toast } = useToast();
   const router = useRouter();
   const push = usePushNotifications();
-  const isDesktop = useMediaQuery("(min-width: 1024px)");
 
-  const Comp = isDesktop ? DialogComp : DrawerComp;
-  const calendarMonthToShow = isDesktop ? 2 : 1;
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -129,10 +94,8 @@ export function BookingForm({bookingValues, email, isUpdatingBooking, isCreating
       name: bookingValues?.name || "",
       guests: bookingValues?.guests?.toString() || "1",
       guests_children: bookingValues?.guests_children?.toString() || "",
-      dates: bookingValues?.dates ?? (selectedDate ? {
-        from: new Date(selectedDate),
-        to: addDays(new Date(selectedDate), 7),
-      } : undefined),
+      from: bookingValues?.dates?.from ?? (selectedDate ? new Date(selectedDate) : undefined),
+      to: bookingValues?.dates?.to ?? (selectedDate ? addDays(new Date(selectedDate), 7) :undefined),
       rooms: bookingValues?.rooms || [],
       message: bookingValues?.message || "",
     },
@@ -240,60 +203,31 @@ export function BookingForm({bookingValues, email, isUpdatingBooking, isCreating
             )}
           />
         </fieldset>
+        <fieldset className="flex gap-3">
+          <legend className="text-base text-gray-600 mb-3">Resedatum</legend>
         <FormField
           control={form.control}
-          name="dates"
+          name="from"
           render={({ field }) => (
-            <FormItem>
-              <FormLabel>Resedatum</FormLabel>
-              <Comp.Wrapper open={open} onOpenChange={setOpen}>
-                <Comp.Trigger asChild>
-                  <FormControl>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full text-left font-normal",
-                        !field.value && "text-muted-foreground"
-                      )}
-                    >
-                      {field.value?.from ? (
-                        field.value.to ? (
-                          <>
-                            {format(field.value.from, "LLL dd, y")} -{" "}
-                            {format(field.value.to, "LLL dd, y")}
-                          </>
-                        ) : (
-                          format(field.value.from, "LLL dd, y")
-                        )
-                      ) : (
-                        <span>Välj datum</span>
-                      )}
-                      <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
-                    </Button>
-                  </FormControl>
-                </Comp.Trigger>
-                <Comp.Content className="w-auto pb-safe-bottom items-center">
-                  <Comp.Header className="text-left">
-                    <Comp.Title>Välj datum</Comp.Title>
-                    <Comp.Description>
-                      Markera dina önskade datum i kalendern nedan
-                    </Comp.Description>
-                  </Comp.Header>
-                  <Calendar
-                    mode="range"
-                    numberOfMonths={calendarMonthToShow}
-                    defaultMonth={field.value?.from}
-                    selected={field.value}
-                    onSelect={field.onChange}
-                    disabled={(date) => date < new Date()}
-                    initialFocus
-                  />
-                </Comp.Content>
-              </Comp.Wrapper>
+            <FormItem className="flex flex-col flex-1">
+              <FormLabel>Ankomst</FormLabel>
+              <DatePicker field={field} title="Välj datum" description="" placeholder="Välj datum" />
               <FormMessage />
             </FormItem>
           )}
         />
+        <FormField
+          control={form.control}
+          name="to"
+          render={({ field }) => (
+            <FormItem className="flex flex-col flex-1">
+              <FormLabel>Avresa</FormLabel>
+              <DatePicker field={field} title="Välj datum" description="" placeholder="Välj avresedatum" arrivalDate={form.control._formValues.from} />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        </fieldset>
 
         <FormField
           control={form.control}
@@ -372,13 +306,26 @@ export function BookingForm({bookingValues, email, isUpdatingBooking, isCreating
   );
 
   function onSubmit(values: z.infer<typeof formSchema>) {
+    const fromDate = new Date(values.from);
+    const toDate = new Date(values.to);
+    fromDate.setHours(12, 0, 0, 0);
+    toDate.setHours(12, 0, 0, 0);
     const fullBooking = {
       ...values,
+      dates: {
+        from: fromDate,
+        to: toDate,
+      },
       id: bookingValues?.id || uuidv4(),
       user_id: bookingValues?.user_id || "",
       created_at: bookingValues?.created_at,
       updated_at: bookingValues?.updated_at,
     }
+
+    if (isDevelopment) {
+      fullBooking.is_test_booking = true;
+    }
+
    if (isCreatingNewBooking) {
     try {
       createBooking(fullBooking, email);
@@ -391,7 +338,9 @@ export function BookingForm({bookingValues, email, isUpdatingBooking, isCreating
       setIsSending(false);
     }
     finally {
-      sendNotification(fullBooking)
+      if (!isDevelopment) {
+        sendNotification(fullBooking)
+      } 
       setIsSending(false);
     }
    } else {

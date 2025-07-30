@@ -21,7 +21,8 @@ export default async function CalendarPage() {
       }
     },
     where: {
-      is_canceled: false
+      is_canceled: false,
+      is_test_booking: process.env.NODE_ENV === 'development',
     }
   });
 
