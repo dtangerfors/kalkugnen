@@ -20,7 +20,8 @@ export default async function BookingsListPage() {
         }
       },
       where: {
-        is_canceled: false
+        is_canceled: false,
+        is_test_booking: false,
       }
     });
   

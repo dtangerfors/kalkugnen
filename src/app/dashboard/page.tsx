@@ -89,6 +89,9 @@ async function getBookingsDueWithin30Days() {
   // Query the database
   const bookings = await prisma.booking.findMany({
     take: 3,
+    orderBy: {
+      arrival: "asc",
+    },
     include: {
       user: {
         select: {
@@ -98,7 +101,10 @@ async function getBookingsDueWithin30Days() {
     },
     where: {
       AND: [
-        { is_canceled: false }, // Exclude canceled bookings
+        { 
+          is_canceled: false,
+          is_test_booking: false, 
+        }, // Exclude canceled bookings
         {
           arrival: {
             gte: today, // Greater than or equal to today

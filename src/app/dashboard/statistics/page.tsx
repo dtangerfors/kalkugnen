@@ -23,7 +23,9 @@ export default async function StatisticsPage() {
     },
     where: {
       AND: [
-        { is_canceled: false }, // Exclude canceled bookings
+        { 
+          is_canceled: false,
+          is_test_booking: false, }, // Exclude canceled bookings
       ],
     }
   });

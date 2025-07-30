@@ -25,7 +25,8 @@ export default async function UniqueBookingModalPage(props: {
   const id = params.id;
   const booking = await prisma.booking.findUnique({
     where: {
-      id: id
+      id: id,
+      is_test_booking: false,
     },
     include: {
       user: {

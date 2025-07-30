@@ -39,6 +39,7 @@ export default async function UniqueBookingPage(props: {
   return (
     <Main>
       <Section>
+        <div className="relative mt-14 pt-safe-top">
         <div className="p-6 w-full max-w-screen-sm m-auto bg-white rounded-lg">
           <header className="flex flex-col items-center py-6">
             <picture className="size-20 flex-shrink-0 rounded-full overflow-hidden">
@@ -109,6 +110,7 @@ export default async function UniqueBookingPage(props: {
               {new Date(Number(booking.created_at)).toLocaleString("sv-SE")}
             </p>
           </footer>
+        </div>
         </div>
       </Section>
     </Main>
