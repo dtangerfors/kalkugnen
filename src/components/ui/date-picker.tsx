@@ -54,7 +54,7 @@ arrivalDate?: Date
   const [open, setOpen] = useState(false);
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
-  const Comp = isDesktop ? PopoverComp : DrawerComp;
+  const Comp = PopoverComp;
   const calendarMonthToShow = isDesktop ? 2 : 1;
 
   const disabledDates = () => {
@@ -85,7 +85,7 @@ arrivalDate?: Date
           </Button>
         </FormControl>
       </Comp.Trigger>
-      <Comp.Content className="w-auto p-0">
+      <Comp.Content className={cn("w-auto p-0")}>
         <Comp.Header className="text-left p-4 pb-2">
           <Comp.Title>{title}</Comp.Title>
           <Comp.Description>{description}</Comp.Description>
