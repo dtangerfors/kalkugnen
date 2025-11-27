@@ -72,12 +72,12 @@ export default async function DashboardIndex() {
               <Typography variant="body" level="h2" color="text-black">Information</Typography>
             </div>
             <article
-              key={post.id}
+              key={"error-post"}
               className="flex flex-col flex-1 gap-6 overflow-hidden rounded-2xl p-4 pb-6 bg-white"
             >
               <header>
                 <h2 className="text-xl text-foreground font-sans font-semibold">
-                  {post.title.rendered}
+                  Data kan inte läsas in
                 </h2>
               </header>
               <div
