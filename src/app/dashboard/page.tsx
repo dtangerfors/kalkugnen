@@ -18,7 +18,7 @@ import { currentUser } from "@clerk/nextjs/server";
 export default async function DashboardIndex() {
   const { isMobile } = await getDeviceType();
   const user = await currentUser();
-  const posts = await fetchPosts();
+  // const posts = await fetchPosts();
   const upcomingBookings = await getBookingsDueWithin30Days();
 
   const bgImage = isMobile ? "/cover-vallmo-mobile.jpg" : "/cover-vallmo.jpg";
@@ -71,9 +71,29 @@ export default async function DashboardIndex() {
             <div className="mb-6">
               <Typography variant="body" level="h2" color="text-black">Information</Typography>
             </div>
-            <Suspense fallback={<PostsLoading />}>
+            <article
+              key={post.id}
+              className="flex flex-col flex-1 gap-6 overflow-hidden rounded-2xl p-4 pb-6 bg-white"
+            >
+              <header>
+                <h2 className="text-xl text-foreground font-sans font-semibold">
+                  {post.title.rendered}
+                </h2>
+              </header>
+              <div
+                className="wp-post-content"
+              >
+                <p>Just nu kan data inte läsas in från Wordpress.</p>
+              </div>
+              <footer className="mt-auto pt-8">
+                <p className="text-sm text-foreground-1">
+                  Publicerat av Daniel, 27 november 2025
+                </p>
+              </footer>
+            </article>
+            {/* <Suspense fallback={<PostsLoading />}>
               <InfoPosts data={posts} />
-            </Suspense>
+            </Suspense> */}
         </Section>
         </Main>
     </>
