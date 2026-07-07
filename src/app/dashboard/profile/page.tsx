@@ -7,34 +7,38 @@ import { sortBookingsByYear } from "@/lib/utils";
 import { BookingData } from "@/lib/types";
 import { Main, Section } from "@/components/dashboard/sections";
 import ProfileBookingCard from "@/components/ui/profile-booking-card";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NiceAvatarProps } from "@/components/avatar/types";
 
 export default async function ProfilePage() {
-  const user = await currentUser();
-  
-  const avatar = await prisma.avatar.findUnique({
-    where: {
-      id: user?.publicMetadata.avatarId as string
-    }
-  })
+  const { userId, sessionClaims } = await auth();
 
-  const bookings = await prisma.booking.findMany({
-    where: {
-      user_id: user?.id,
-      is_test_booking: false,
-    }, 
-    include: {
-      user: {
-        select: {
-          avatar: true
-        }
+  // currentUser() (Clerk profile fetch) is only needed for the display name;
+  // the ids come from the already-verified session, so run all three in parallel.
+  const [user, avatar, bookings] = await Promise.all([
+    currentUser(),
+    prisma.avatar.findUnique({
+      where: {
+        id: sessionClaims?.metadata.avatarId as string
       }
-    },
-    orderBy: {
-      arrival: "desc",
-    }
-  })
+    }),
+    prisma.booking.findMany({
+      where: {
+        user_id: userId as string,
+        is_test_booking: false,
+      },
+      include: {
+        user: {
+          select: {
+            avatar: true
+          }
+        }
+      },
+      orderBy: {
+        arrival: "desc",
+      }
+    }),
+  ]);
 
   const groupedBookings = await sortBookingsByYear(bookings as BookingData[])
   
