@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Image from "next/image";
 import Weather from "@/components/weather";
 import { Main, Section } from "@/components/dashboard/sections";
@@ -41,7 +42,9 @@ export default async function DashboardIndex() {
             <Typography variant="xl" level="h1" color="text-white">
               Hej {user?.firstName}
             </Typography>
-            <Weather lon="19.039444" lat="57.855" />
+            <Suspense fallback={<p className="text-white text-sm">Laddar väderdata ...</p>}>
+              <Weather lon="19.039444" lat="57.855" />
+            </Suspense>
           </div>
         </div>
         <Main>
