@@ -1,6 +1,5 @@
 import FixedHeader from "@/components/dashboard/fixed-header";
 import { prisma } from "@/lib/prisma";
-import { getDeviceType } from "@/lib/server-utils";
 import { cn } from "@/lib/utils";
 import { Tile } from "./tile";
 import { thisYear, getTotalGuestsThisYear, getTotalDaysThisYear } from './utils';
@@ -11,7 +10,6 @@ import { UserTable } from "./user-table";
 import { Typography } from "@/components/ui/typography";
 
 export default async function StatisticsPage() {
-  const { isMobile } = await getDeviceType();
   const bookings = await prisma.booking.findMany({
     include: {
       user: {
@@ -33,8 +31,8 @@ export default async function StatisticsPage() {
 
   return (
     <>
-      {isMobile && <FixedHeader label="Statistik" />}
-      <header className={cn("bg-primary pt-safe-top", isMobile && "mt-14")}>
+      <div className="lg:hidden"><FixedHeader label="Statistik" /></div>
+      <header className={cn("bg-primary pt-safe-top max-lg:mt-14")}>
         <div className="p-6 pb-10 flex items-end">
           <Typography level="h1" variant="xl" color="text-white">Statistik</Typography>
         </div>

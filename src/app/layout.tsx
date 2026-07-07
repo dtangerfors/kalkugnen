@@ -1,8 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Familjen_Grotesk } from "next/font/google";
 import "./globals.css";
-import { getDeviceType } from "@/lib/server-utils";
-import clsx from "clsx";
 import {
   ClerkProvider
 } from '@clerk/nextjs'
@@ -26,15 +24,14 @@ export const viewport: Viewport = {
   userScalable: false,
 };
 
-export default async function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
-  const { isMobile } = await getDeviceType();
+export default function RootLayout({ children, }: Readonly<{ children: React.ReactNode; }>) {
   return (
     <ClerkProvider>
       <html lang="sv">
         <head>
           <meta name="apple-mobile-web-app-title" content="Stenbrottet" />
         </head>
-        <body className={clsx(`${familjenGrotesk.variable} antialiased`, isMobile && 'app-mobile')}>
+        <body className={`${familjenGrotesk.variable} antialiased`}>
           <div data-vaul-drawer-wrapper>
           {children}
           </div>
