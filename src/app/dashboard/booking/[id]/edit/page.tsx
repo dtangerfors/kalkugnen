@@ -7,8 +7,10 @@ import { currentUser } from "@clerk/nextjs/server";
 export default async function UpdateBookingPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
   const id = params.id;
-  const booking = await fetchBooking(id);
-  const user = await currentUser();
+  const [booking, user] = await Promise.all([
+    fetchBooking(id),
+    currentUser(),
+  ]);
 
   return (
       <>

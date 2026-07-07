@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Logo from "@/components/logo";
 import Navigation from "./navigation";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 
-export default async function DesktopNav() { 
-  const user = await currentUser();
-  
+export default async function DesktopNav() {
+  const { sessionClaims } = await auth();
+
   return (
     <div className="flex flex-col gap-12">
       <Link
@@ -16,7 +16,7 @@ export default async function DesktopNav() {
           <Logo />
         </div>
       </Link>
-      <Navigation role={user?.publicMetadata.user_role as string} />
+      <Navigation role={sessionClaims?.metadata.user_role as string} />
     </div>
   )
 }

@@ -10,9 +10,11 @@ import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function DashboardIndex() {
-  const user = await currentUser();
   // const posts = await fetchPosts();
-  const upcomingBookings = await getBookingsDueWithin30Days();
+  const [user, upcomingBookings] = await Promise.all([
+    currentUser(),
+    getBookingsDueWithin30Days(),
+  ]);
 
   return (
     <>

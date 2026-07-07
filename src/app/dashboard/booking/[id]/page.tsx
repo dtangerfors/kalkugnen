@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { getRoomName, showGuests, showNiceDates } from "@/lib/functions";
 import { prisma } from "@/lib/prisma";
 import { getBookingName } from "@/lib/utils";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
 import { CancelBookingDialog } from "../../../../components/modal/cancel-booking";
 import Link from "next/link";
@@ -15,7 +15,7 @@ export default async function UniqueBookingPage(props: {
 }) {
   const params = await props.params;
   const id = params.id;
-  const user = await currentUser();
+  const { userId } = await auth();
   const booking = await prisma.booking.findUnique({
     where: {
       id: id,
@@ -34,7 +34,7 @@ export default async function UniqueBookingPage(props: {
     return notFound();
   }
   const isDepartureNotDatePassed = new Date(booking.departure) > new Date();
-  const loggedInUserIsAsSameAsBookingOwner = user?.id === booking.user_id;
+  const loggedInUserIsAsSameAsBookingOwner = userId === booking.user_id;
 
   return (
     <Main>

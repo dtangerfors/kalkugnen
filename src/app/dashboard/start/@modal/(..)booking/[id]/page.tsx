@@ -14,7 +14,7 @@ import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 import Avatar from "@/components/avatar";
 import { NiceAvatarProps } from "@/components/avatar/types";
-import { currentUser } from "@clerk/nextjs/server";
+import { auth } from "@clerk/nextjs/server";
 
 // Force dynamic page
 export const dynamic = "force-dynamic";
@@ -26,7 +26,7 @@ export default async function UniqueBookingModalPage(props: {
 }) {
   const params = await props.params;
   const id = params.id;
-  const user = await currentUser();
+  const { userId } = await auth();
   const booking = await prisma.booking.findUnique({
     where: {
       id: id,
@@ -47,7 +47,7 @@ export default async function UniqueBookingModalPage(props: {
   }
 
   const isDepartureNotDatePassed = new Date(booking.departure) > new Date();
-  const loggedInUserIsAsSameAsBookingOwner = user?.id === booking.user_id;
+  const loggedInUserIsAsSameAsBookingOwner = userId === booking.user_id;
 
   // Valid
   return (
