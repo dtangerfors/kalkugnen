@@ -1,13 +1,7 @@
-import clsx from "clsx";
-import { Suspense } from "react";
 import Image from "next/image";
-import { getDeviceType } from "@/lib/server-utils";
-import { fetchPosts } from "@/lib/data";
 import Weather from "@/components/weather";
 import { Main, Section } from "@/components/dashboard/sections";
 import BookingCard from "@/components/ui/booking-card";
-import { PostsLoading } from "@/components/posts/posts-loading";
-import { InfoPosts } from "@/components/posts/info-posts";
 import FixedHeader from "@/components/dashboard/fixed-header";
 import Logo from "@/components/logo";
 import { Typography } from "@/components/ui/typography";
@@ -16,29 +10,28 @@ import { prisma } from "@/lib/prisma";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function DashboardIndex() {
-  const { isMobile } = await getDeviceType();
   const user = await currentUser();
   // const posts = await fetchPosts();
   const upcomingBookings = await getBookingsDueWithin30Days();
 
-  const bgImage = isMobile ? "/cover-vallmo-mobile.jpg" : "/cover-vallmo.jpg";
-
   return (
     <>
-      {isMobile && <FixedHeader invisibleFromStart>
-        <div className="w-8 fill-primary-300">
-          <Logo />
-        </div>
-        </FixedHeader>}
-        <div className={clsx("relative grid place-items-center overflow-hidden p-6", isMobile ? "h-[27.5rem] pt-safe-top" : "h-96")}>
-          <figure className={clsx(isMobile ? "fixed inset-0 z-[1] h-dvh w-dvw" : "absolute inset-0 h-full w-full")}>
+      <div className="lg:hidden">
+        <FixedHeader invisibleFromStart>
+          <div className="w-8 fill-primary-300">
+            <Logo />
+          </div>
+        </FixedHeader>
+      </div>
+        <div className="relative grid place-items-center overflow-hidden p-6 h-[27.5rem] pt-safe-top lg:h-96 lg:pt-0">
+          <figure className="fixed inset-0 z-[1] h-dvh w-dvw lg:absolute lg:h-full lg:w-full">
             <Image
-              priority
-              src={bgImage}
+              src="/visby-1920.jpg"
               alt="Ett grönt fält med blåeld"
-              width={1920}
-              height={1080}
-              className="h-full w-full object-cover object-bottom"
+              fill
+              priority
+              sizes="100vw"
+              className="object-cover object-center"
             />
            <div className="fixed inset-0 h-full w-full bg-gradient-to-b from-black/30 from-[30rem] to-background to-[30rem]"></div>
           </figure>

@@ -2,10 +2,6 @@
    @apply relative flex flex-col;
 }
 
-body:not(.app-mobile) .rbc-calendar {
-   @apply h-[calc(100vh-10rem-3px)] overflow-hidden;
-} 
-
 /* Navigation */
 .rbc-toolbar {
    @apply flex justify-between items-center mb-4;
@@ -20,36 +16,16 @@ body:not(.app-mobile) .rbc-calendar {
 }
 
 .rbc-btn-group {
-   @apply flex gap-1; 
+   @apply flex gap-1;
 }
 
 .rbc-btn-group button {
    @apply rounded-3xl border-2 text-base font-semibold py-1 px-3 leading-none transition-all duration-300 bg-white border-gray-50 text-black hover:bg-gray-100 hover:border-gray-100 active:bg-gray-200 active:border-gray-200;
 }
 
-.app-mobile .rbc-toolbar {
-   @apply absolute -bottom-px w-full bg-background pt-5 px-6 mb-0 rounded-t-2xl;
-}
-
-.app-mobile .rbc-btn-group {
-   @apply w-full;
-}
-
-.app-mobile .rbc-btn-group button {
-   @apply first:mr-auto;
-}
-
-.app-mobile .rbc-toolbar-label {
-   @apply hidden;
-}
-
 /* View */
 .rbc-month-view {
    @apply flex-1 flex flex-col;
-}
-
-.app-mobile .rbc-month-view {
-   @apply mx-4 mb-20 block;
 }
 
 /* Header Row */
@@ -64,14 +40,6 @@ body:not(.app-mobile) .rbc-calendar {
 /* Month Row */
 .rbc-month-row {
    @apply flex flex-col flex-1 relative border-x border-b border-gray-100;
-}
-
-.app-mobile .rbc-month-row {
-   @apply h-14 border-none;
-}
-
-.app-mobile .rbc-day-bg+.rbc-day-bg {
-   @apply border-none;
 }
 
 .rbc-month-row:nth-child(2) {
@@ -125,10 +93,6 @@ body:not(.app-mobile) .rbc-calendar {
    @apply mb-1;
 }
 
-.app-mobile .rbc-row-segment {
-   @apply mb-0.5;
-}
-
 .rbc-event {
    @apply rounded-md h-1;
 }
@@ -145,11 +109,54 @@ body:not(.app-mobile) .rbc-calendar {
    @apply rounded-none -mx-4 lg:mx-0;
 }
 
-.rbc-event-continues-prior.rbc-event-continues-after .event-title, 
+.rbc-event-continues-prior.rbc-event-continues-after .event-title,
 .rbc-event-continues-prior .event-title {
    @apply hidden;
-} 
+}
 
 .rbc-event-content {
    @apply hidden text-xs text-black sr-only md:not-sr-only dark:text-white;
+}
+
+/* Desktop (>= lg). Replaces the old `body:not(.app-mobile)` selector. */
+@media (min-width: 1024px) {
+   .rbc-calendar {
+      @apply h-[calc(100vh-10rem-3px)] overflow-hidden;
+   }
+}
+
+/* Mobile (< lg). Replaces the old `.app-mobile` body-class selectors.
+   Placed after the base rules so equal-specificity overrides still win. */
+@media (max-width: 1023.98px) {
+   .rbc-toolbar {
+      @apply absolute -bottom-px w-full bg-background pt-5 px-6 mb-0 rounded-t-2xl;
+   }
+
+   .rbc-btn-group {
+      @apply w-full;
+   }
+
+   .rbc-btn-group button {
+      @apply first:mr-auto;
+   }
+
+   .rbc-toolbar-label {
+      @apply hidden;
+   }
+
+   .rbc-month-view {
+      @apply mx-4 mb-20 block;
+   }
+
+   .rbc-month-row {
+      @apply h-14 border-none;
+   }
+
+   .rbc-day-bg+.rbc-day-bg {
+      @apply border-none;
+   }
+
+   .rbc-row-segment {
+      @apply mb-0.5;
+   }
 }

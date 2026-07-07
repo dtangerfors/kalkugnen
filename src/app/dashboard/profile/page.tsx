@@ -1,7 +1,6 @@
 import FixedHeader from "@/components/dashboard/fixed-header";
 import { Typography } from "@/components/ui/typography";
 import { prisma } from "@/lib/prisma";
-import { getDeviceType } from "@/lib/server-utils";
 import clsx from "clsx";
 import AvatarEdit from "./avatar-edit";
 import { sortBookingsByYear } from "@/lib/utils";
@@ -12,7 +11,6 @@ import { currentUser } from "@clerk/nextjs/server";
 import { NiceAvatarProps } from "@/components/avatar/types";
 
 export default async function ProfilePage() {
-  const { isMobile } = await getDeviceType();
   const user = await currentUser();
   
   const avatar = await prisma.avatar.findUnique({
@@ -42,8 +40,8 @@ export default async function ProfilePage() {
   
   return (
     <>
-      {isMobile && <FixedHeader label={user?.fullName} />}
-      <div className={clsx("relative", isMobile && "mt-14 pt-safe-top")}>
+      <div className="lg:hidden"><FixedHeader label={user?.fullName} /></div>
+      <div className={clsx("relative max-lg:mt-14 max-lg:pt-safe-top")}>
         <header className={clsx("relative bg-primary p-6 pb-20")}>
           <div className="flex flex-col items-center gap-6 max-w-screen-sm mx-auto">
             <AvatarEdit config={avatar as NiceAvatarProps}/>
