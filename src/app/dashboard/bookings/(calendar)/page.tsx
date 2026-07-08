@@ -1,6 +1,4 @@
 import { Suspense } from "react";
-import clsx from "clsx";
-import { getDeviceType } from "@/lib/server-utils";
 import CalendarProvider from "./context";
 import { CalendarView } from "./calendar-view";
 import { BookingsInView } from "./bookings-in-view";
@@ -10,7 +8,6 @@ import { BookingsFixedHeader } from "../bookings-header";
 import { NavSwitch } from "@/components/dashboard/nav-switch";
 
 export default async function CalendarPage() {
-  const { isMobile } = await getDeviceType(); 
   const bookings = await prisma.booking.findMany({
     include: {
       user: {
@@ -33,22 +30,20 @@ export default async function CalendarPage() {
 
   return (
     <CalendarProvider bookings={bookings}>
-      <div className={clsx(isMobile && "flex flex-col h-full bg-gradient-to-b from-white from-25% to-25% to-background")}>
-        {isMobile && (
+      <div className="max-lg:flex max-lg:flex-col max-lg:h-full max-lg:bg-gradient-to-b max-lg:from-white max-lg:from-25% max-lg:to-25% max-lg:to-background">
+        <div className="lg:hidden">
           <BookingsFixedHeader month />
-        )}
-        <div className={clsx("@container",!isMobile && "border-l bg-white", isMobile && "mt-20 pt-safe-top")}>
-          <div className={clsx("flex flex-col @4xl:grid @4xl:grid-cols-3 w-full", !isMobile && "gap-6")}>
+        </div>
+        <div className="@container lg:border-l lg:bg-white max-lg:mt-20 max-lg:pt-safe-top">
+          <div className="flex flex-col @4xl:grid @4xl:grid-cols-3 w-full lg:gap-6">
             <Suspense fallback={<CalendarSkeleton />}>
-              <CalendarView bookings={bookings} isMobile={isMobile} />
+              <CalendarView bookings={bookings} />
             </Suspense>
 
-            <div className={clsx("@container relative grow bg-background", !isMobile && "rounded-t-3xl @4xl:h-dvh @4xl:rounded-tr-none @4xl:rounded-l-3xl", isMobile && "pb-24")}>
-              {!isMobile && 
-                <div className="flex justify-center w-full p-4">
-                  <NavSwitch links={links} />
-                </div>
-              }
+            <div className="@container relative grow bg-background lg:rounded-t-3xl @4xl:h-dvh @4xl:rounded-tr-none @4xl:rounded-l-3xl max-lg:pb-24">
+              <div className="hidden lg:flex justify-center w-full p-4">
+                <NavSwitch links={links} />
+              </div>
               <Suspense fallback={<BookingEventSkeleton />}>
                 <BookingsInView />
               </Suspense>

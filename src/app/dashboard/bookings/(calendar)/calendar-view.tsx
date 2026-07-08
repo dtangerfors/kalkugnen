@@ -10,10 +10,9 @@ import {sv} from "date-fns/locale/sv";
 
 import "./calendar-styles.css";
 import { useAppContext } from "@/app/dashboard/app-context";
-import clsx from "clsx";
 import { getRawColor } from "@/lib/functions";
 
-export function CalendarView({bookings, isMobile}: {bookings: BookingData[], isMobile: RegExpMatchArray | null}) {
+export function CalendarView({bookings}: {bookings: BookingData[]}) {
   const router = useRouter();
   const [events, setEvents] = useState<BookingEvent[]>([]);
   const { setCurrentMonth, setCurrentCalendarDate } = useCalendarContext();
@@ -68,7 +67,7 @@ export function CalendarView({bookings, isMobile}: {bookings: BookingData[], isM
   }, [setCurrentMonth, setCurrentCalendarDate])
 
   return (
-    <div className={clsx("relative md:col-span-2 transition-all bg-white", isMobile ? "p-0" : "p-6")}>
+    <div className="relative md:col-span-2 transition-all bg-white p-0 lg:p-6">
       <Calendar
         culture="sv"
         date={date}

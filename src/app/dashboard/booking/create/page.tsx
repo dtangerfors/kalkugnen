@@ -1,16 +1,14 @@
 import FixedHeader from "@/components/dashboard/fixed-header";
 import { BookingForm } from "@/components/forms/booking";
 import { Typography } from "@/components/ui/typography";
-import { getDeviceType } from "@/lib/server-utils";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function CreateBookingPage() {
-  const { isMobile } = await getDeviceType();
   const user = await currentUser();
 
   return (
     <>
-    {isMobile && <FixedHeader label={"Skapa ny bokning"} invisibleFromStart />}
+    <div className="lg:hidden"><FixedHeader label={"Skapa ny bokning"} invisibleFromStart /></div>
     <div className="pt-safe-top lg:p-6 max-lg:pb-24">
       <header className="max-w-screen-sm mx-auto p-6 lg:pt-20">
           <Typography level="h1" variant="xl" color="text-black">Skapa ny bokning</Typography>

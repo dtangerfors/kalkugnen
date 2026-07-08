@@ -1,13 +1,11 @@
 import { prisma } from "@/lib/prisma";
 import BookingCard from "@/components/ui/booking-card";
-import { getDeviceType } from "@/lib/server-utils";
 import { BookingsFixedHeader } from "../bookings-header";
-import { cn, getMonthTitle, groupBookingsByMonth } from "@/lib/utils";
+import { getMonthTitle, groupBookingsByMonth } from "@/lib/utils";
 import { Typography } from "@/components/ui/typography";
 import { NavSwitch } from "@/components/dashboard/nav-switch";
 
 export default async function BookingsListPage() {
-  const { isMobile } = await getDeviceType(); 
   const bookings = await prisma.booking.findMany({
     orderBy: {
       arrival: "desc"
@@ -33,15 +31,13 @@ export default async function BookingsListPage() {
   
   return (
     <>
-    {isMobile && (
+    <div className="lg:hidden">
       <BookingsFixedHeader label="Alla bokningar" />
-    )}
-    {!isMobile && 
-      <div className="flex justify-center w-full p-4">
-        <NavSwitch links={links} />
-      </div>
-    }
-    <div className={cn("p-6 max-w-screen-sm mx-auto max-lg:pb-[6.5rem]", isMobile && "mt-20 pt-safe-top")}>
+    </div>
+    <div className="hidden lg:flex justify-center w-full p-4">
+      <NavSwitch links={links} />
+    </div>
+    <div className="p-6 max-w-screen-sm mx-auto max-lg:pb-[6.5rem] max-lg:mt-20 max-lg:pt-safe-top">
       {Object.entries(sortedBookings).map(([month, bookings]) => (
       <div key={month} className="mb-6 first:pt-6">
         <div className="flex justify-between mb-4 ml-4">

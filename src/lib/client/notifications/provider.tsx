@@ -65,7 +65,10 @@ export const PushNotificationsProvider: FunctionComponent<PushNotificationsProvi
 				const sub = await registration.pushManager.getSubscription();
 				setSubscription(sub);
 				setSubscriptionLoaded(true);
-			})();
+			})().catch((err) => {
+				// e.g. no /sw.js in dev (Serwist is production-only) — degrade gracefully.
+				console.error('Service worker registration failed', err);
+			});
 		}
 	}, []);
 
