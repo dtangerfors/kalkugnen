@@ -1,6 +1,7 @@
 import FixedHeader from "@/components/dashboard/fixed-header";
 import { Typography } from "@/components/ui/typography";
 import { prisma } from "@/lib/prisma";
+import { bookingDb } from "@/lib/booking-db";
 import clsx from "clsx";
 import AvatarEdit from "./avatar-edit";
 import { sortBookingsByYear } from "@/lib/utils";
@@ -22,10 +23,9 @@ export default async function ProfilePage() {
         id: sessionClaims?.metadata.avatarId as string
       }
     }),
-    prisma.booking.findMany({
+    bookingDb.findMany({
       where: {
         user_id: userId as string,
-        is_test_booking: false,
       },
       include: {
         user: {

@@ -3,12 +3,12 @@ import CalendarProvider from "./context";
 import { CalendarView } from "./calendar-view";
 import { BookingsInView } from "./bookings-in-view";
 import { BookingEventSkeleton, CalendarSkeleton } from "@/components/skeletons";
-import { prisma } from "@/lib/prisma";
+import { bookingDb } from "@/lib/booking-db";
 import { BookingsFixedHeader } from "../bookings-header";
 import { NavSwitch } from "@/components/dashboard/nav-switch";
 
 export default async function CalendarPage() {
-  const bookings = await prisma.booking.findMany({
+  const bookings = await bookingDb.findMany({
     include: {
       user: {
         select: {
@@ -19,7 +19,6 @@ export default async function CalendarPage() {
     },
     where: {
       is_canceled: false,
-      is_test_booking: process.env.NODE_ENV === 'development',
     }
   });
 

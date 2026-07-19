@@ -7,7 +7,7 @@ import FixedHeader from "@/components/dashboard/fixed-header";
 import Logo from "@/components/logo";
 import { Typography } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button-primary";
-import { prisma } from "@/lib/prisma";
+import { bookingDb } from "@/lib/booking-db";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function DashboardIndex() {
@@ -105,7 +105,7 @@ async function getBookingsDueWithin30Days() {
   thirtyDaysFromNow.setDate(today.getDate() + 30);
 
   // Query the database
-  const bookings = await prisma.booking.findMany({
+  const bookings = await bookingDb.findMany({
     take: 3,
     orderBy: {
       arrival: "asc",
@@ -121,7 +121,6 @@ async function getBookingsDueWithin30Days() {
       AND: [
         { 
           is_canceled: false,
-          is_test_booking: false, 
         }, // Exclude canceled bookings
         {
           arrival: {

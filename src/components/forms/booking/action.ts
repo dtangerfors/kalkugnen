@@ -1,7 +1,7 @@
 "use server";
 
 import { BookingFormValues } from ".";
-import { prisma } from "@/lib/prisma";
+import { bookingDb } from "@/lib/booking-db";
 import { redirect } from "next/navigation";
 import { PrismaClientKnownRequestError } from "@prisma/client/runtime/library";
 import { sendEmail } from "@/app/api/emails/sendEmail";
@@ -21,7 +21,7 @@ export async function createBooking(values: BookingFormValues, email: string | u
   const created_at = Date.now();
   const updated_at = Date.now();
 
-  await prisma.booking.create({
+  await bookingDb.create({
     data: {
       user_id,
       booking_name,
@@ -67,7 +67,7 @@ export async function updateBooking(values: BookingFormValues) {
     created_at,
   } = values;
   try {
-    await prisma.booking.update({
+    await bookingDb.update({
       where: {
         id: id,
       },

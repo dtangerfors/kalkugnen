@@ -61,7 +61,6 @@ export const formSchema = z.object({
   }),
   message: z.string().max(1000).optional(),
   is_rented_out: z.boolean().optional(),
-  is_test_booking: z.boolean().optional(),
 }).refine((data) => data.to > data.from, {
   message: "Slutdatumet måste vara efter startdatumet.",
   path: ["to"],
@@ -333,10 +332,6 @@ export function BookingForm({bookingValues, email, isUpdatingBooking, isCreating
       user_id: bookingValues?.user_id || "",
       created_at: bookingValues?.created_at,
       updated_at: bookingValues?.updated_at,
-    }
-
-    if (isDevelopment) {
-      fullBooking.is_test_booking = true;
     }
 
     setIsSending(true);
