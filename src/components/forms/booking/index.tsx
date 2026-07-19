@@ -80,6 +80,19 @@ export type BookingFormValues = {
 
 const isDevelopment = process.env.NODE_ENV === 'development';
 
+// A server action's redirect() surfaces on the client as a thrown error carrying
+// a "NEXT_REDIRECT" digest. Detect it so we don't mistake a successful redirect
+// for a failure.
+function isRedirectError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    typeof (error as { digest: unknown }).digest === "string" &&
+    (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+  );
+}
+
 export function BookingForm({bookingValues, email, isUpdatingBooking, isCreatingNewBooking}: {bookingValues?: BookingFormValues; email: string | undefined; isUpdatingBooking?: boolean; isCreatingNewBooking?: boolean;}) {
   const [isSending, setIsSending] = useState(false);
   const { selectedDate } = useAppContext();
@@ -305,7 +318,7 @@ export function BookingForm({bookingValues, email, isUpdatingBooking, isCreating
     </Form>
   );
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     const fromDate = new Date(values.from);
     const toDate = new Date(values.to);
     fromDate.setHours(12, 0, 0, 0);
@@ -326,44 +339,43 @@ export function BookingForm({bookingValues, email, isUpdatingBooking, isCreating
       fullBooking.is_test_booking = true;
     }
 
-   if (isCreatingNewBooking) {
-    try {
-      createBooking(fullBooking, email);
-      setIsSending(true);
-    } catch {
-      toast({
-        title: "Något gick fel",
-        description: "På grund av ett fel kunde din bokning inte skapas. Försök igen senare.",
-      });
-      setIsSending(false);
+    setIsSending(true);
+
+    if (isCreatingNewBooking) {
+      try {
+        await createBooking(fullBooking, email);
+        if (!isDevelopment) {
+          await sendNotification(fullBooking);
+        }
+      } catch (error) {
+        // createBooking navigates away via redirect() on success, which surfaces
+        // here as a thrown NEXT_REDIRECT — let Next handle it rather than treating
+        // it as a failure.
+        if (isRedirectError(error)) {
+          throw error;
+        }
+        toast({
+          title: "Något gick fel",
+          description: "På grund av ett fel kunde din bokning inte skapas. Försök igen senare.",
+        });
+        setIsSending(false);
+      }
+    } else {
+      try {
+        await updateBooking(fullBooking);
+        toast({
+          title: "Bokning uppdaterad",
+          description: "Din bokning har uppdaterats.",
+        });
+        router.push(`/dashboard/profile`);
+      } catch {
+        toast({
+          title: "Något gick fel",
+          description: "På grund av ett fel kunde din bokning inte uppdateras. Försök igen senare.",
+        });
+        setIsSending(false);
+      }
     }
-    finally {
-      if (!isDevelopment) {
-        sendNotification(fullBooking)
-      } 
-      setIsSending(false);
-    }
-   } else {
-    try {
-      updateBooking(fullBooking);
-      setIsSending(true);
-    } 
-    catch {
-      toast({
-        title: "Något gick fel",
-        description: "På grund av ett fel kunde din bokning inte uppdateras. Försök igen senare.",
-      });
-      setIsSending(false);
-    }
-    finally {
-      toast({
-        title: "Boking uppdaterad",
-        description: "Din bokning har uppdaterats.",
-      });
-      setIsSending(false);
-      router.push(`/dashboard/profile`);
-    }
-   }
   }
 
   async function sendNotification(values: BookingFormValues) {
