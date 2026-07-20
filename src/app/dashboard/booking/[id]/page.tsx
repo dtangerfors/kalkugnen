@@ -1,7 +1,7 @@
 import { Main, Section } from "@/components/dashboard/sections";
 import { Button } from "@/components/ui/button";
 import { getRoomName, showGuests, showNiceDates } from "@/lib/functions";
-import { prisma } from "@/lib/prisma";
+import { bookingDb } from "@/lib/booking-db";
 import { getBookingName } from "@/lib/utils";
 import { auth } from "@clerk/nextjs/server";
 import { notFound } from "next/navigation";
@@ -16,7 +16,7 @@ export default async function UniqueBookingPage(props: {
   const params = await props.params;
   const id = params.id;
   const { userId } = await auth();
-  const booking = await prisma.booking.findUnique({
+  const booking = await bookingDb.findUnique({
     where: {
       id: id,
     },
