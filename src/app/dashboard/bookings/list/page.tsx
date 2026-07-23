@@ -1,4 +1,4 @@
-import { prisma } from "@/lib/prisma";
+import { bookingDb } from "@/lib/booking-db";
 import BookingCard from "@/components/ui/booking-card";
 import { BookingsFixedHeader } from "../bookings-header";
 import { getMonthTitle, groupBookingsByMonth } from "@/lib/utils";
@@ -6,7 +6,7 @@ import { Typography } from "@/components/ui/typography";
 import { NavSwitch } from "@/components/dashboard/nav-switch";
 
 export default async function BookingsListPage() {
-  const bookings = await prisma.booking.findMany({
+  const bookings = await bookingDb.findMany({
     orderBy: {
       arrival: "desc"
     },
@@ -19,7 +19,6 @@ export default async function BookingsListPage() {
       },
       where: {
         is_canceled: false,
-        is_test_booking: false,
       }
     });
   

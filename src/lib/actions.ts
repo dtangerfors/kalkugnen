@@ -6,7 +6,7 @@ import { z } from "zod";
 import { CompleteRegistrationFormValues } from "./types";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { prisma } from "./prisma";
+import { bookingDb } from "./booking-db";
 
 const AvatarSchema = z.object({
   id: z.string(),
@@ -107,7 +107,7 @@ export async function createUser(data: CompleteRegistrationFormValues) {
 
 export async function cancelBooking(id: string) {
   try {
-    await prisma.booking.update({
+    await bookingDb.update({
       where: {
         id: id
       },
@@ -124,7 +124,7 @@ export async function cancelBooking(id: string) {
 }
 
 export async function fetchBooking(id: string) {
-  const booking = await prisma.booking.findUnique({
+  const booking = await bookingDb.findUnique({
     where: {
       id: id
     }

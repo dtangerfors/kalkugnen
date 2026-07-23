@@ -11,7 +11,7 @@ import { notFound } from "next/navigation";
 import { CancelBookingDialog } from "@/components/modal/cancel-booking";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { bookingDb } from "@/lib/booking-db";
 import Avatar from "@/components/avatar";
 import { NiceAvatarProps } from "@/components/avatar/types";
 import { auth } from "@clerk/nextjs/server";
@@ -27,10 +27,9 @@ export default async function UniqueBookingModalPage(props: {
   const params = await props.params;
   const id = params.id;
   const { userId } = await auth();
-  const booking = await prisma.booking.findUnique({
+  const booking = await bookingDb.findUnique({
     where: {
       id: id,
-      is_test_booking: false,
     },
     include: {
       user: {

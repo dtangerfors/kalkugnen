@@ -11,7 +11,7 @@ import { notFound } from "next/navigation";
 import { CancelBookingDialog } from "@/components/modal/cancel-booking";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { prisma } from "@/lib/prisma";
+import { bookingDb } from "@/lib/booking-db";
 
 // Force dynamic page
 export const dynamic = "force-dynamic";
@@ -23,10 +23,9 @@ export default async function UniqueBookingModalPage(props: {
 }) {
   const params = await props.params;
   const id = params.id;
-  const booking = await prisma.booking.findUnique({
+  const booking = await bookingDb.findUnique({
     where: {
       id: id,
-      is_test_booking: false,
     },
     include: {
       user: {

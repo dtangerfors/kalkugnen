@@ -55,8 +55,9 @@ model AppUser {
   id         String          @id
   user_role  user_role_type? @default(user)
   avatar     Avatar?
-  family_id  String?        
+  family_id  String?
   bookings   Booking[]
+  dev_bookings DevBooking[]
   family     Family? @relation(fields: [family_id], references: [id])
   user_color String
   instance  clerk_instance? @default(production)
@@ -93,8 +94,27 @@ model Booking {
   rooms           String[]
   message         String?
   is_canceled     Boolean? @default(false)
-  is_test_booking Boolean? @default(false)
   is_rented_out  Boolean? @default(false)
+}
+
+// Bookings created while running in the dev environment live here so they never
+// mix with real production bookings. Mirrors the `Booking` shape exactly.
+model DevBooking {
+  id              String   @id @default(uuid())
+  created_at      BigInt
+  updated_at      BigInt
+  user            AppUser  @relation(fields: [user_id], references: [id])
+  user_id         String
+  booking_name    String?
+  name            String
+  arrival         DateTime @default(now()) @db.Date
+  departure       DateTime @default(now()) @db.Date
+  guests          Int
+  guests_children Int?
+  rooms           String[]
+  message         String?
+  is_canceled     Boolean? @default(false)
+  is_rented_out   Boolean? @default(false)
 }
 
 model Family {

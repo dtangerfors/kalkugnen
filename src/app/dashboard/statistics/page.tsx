@@ -1,5 +1,5 @@
 import FixedHeader from "@/components/dashboard/fixed-header";
-import { prisma } from "@/lib/prisma";
+import { bookingDb } from "@/lib/booking-db";
 import { cn } from "@/lib/utils";
 import { Tile } from "./tile";
 import { thisYear, getTotalGuestsThisYear, getTotalDaysThisYear } from './utils';
@@ -10,7 +10,7 @@ import { UserTable } from "./user-table";
 import { Typography } from "@/components/ui/typography";
 
 export default async function StatisticsPage() {
-  const bookings = await prisma.booking.findMany({
+  const bookings = await bookingDb.findMany({
     include: {
       user: {
         select: {
@@ -22,8 +22,7 @@ export default async function StatisticsPage() {
     where: {
       AND: [
         { 
-          is_canceled: false,
-          is_test_booking: false, }, // Exclude canceled bookings
+          is_canceled: false, }, // Exclude canceled bookings
       ],
     }
   });
