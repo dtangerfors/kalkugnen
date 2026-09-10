@@ -93,44 +93,6 @@ export type SortedBooking = {
   [year: number]: BookingData[];
 }
 
-export type InfoPost = {
-  id: number;
-  date: string;
-  date_gmt: string;
-  guid: {rendered: string;};
-  modified: string;
-  modified_gmt: string;
-  slug: string;
-  status: string;
-  type: string;
-  link: string;
-  title: {rendered: string;};
-  content: {rendered: string; protected: boolean;};
-  excerpt: {rendered: string; protected: boolean;};
-  author: number;
-  featured_media: number;
-  comment_status: string;
-  ping_status: string;
-  sticky: boolean;
-  template: string;
-  format: string;
-  meta: { inline_featured_image: boolean, footnotes: string };
-  categories: number[];
-  tags: number[];
-  _links: {
-    self: [],
-    collection: [],
-    about: [],
-    author: [],
-    replies: [],
-    'version-history': [],
-    'predecessor-version': [],
-    'wp:attachment': [],
-    'wp:term': [],
-    curies: []
-  }
-}
-
 export type ImageProps = {
   src: string;
   width: number;
