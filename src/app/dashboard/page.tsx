@@ -9,9 +9,10 @@ import { Typography } from "@/components/ui/typography";
 import { Button } from "@/components/ui/button-primary";
 import { bookingDb } from "@/lib/booking-db";
 import { currentUser } from "@clerk/nextjs/server";
+import { InfoPosts } from "@/components/posts/info-posts";
+import { infoPosts } from "@/lib/info-posts";
 
 export default async function DashboardIndex() {
-  // const posts = await fetchPosts();
   const [user, upcomingBookings] = await Promise.all([
     currentUser(),
     getBookingsDueWithin30Days(),
@@ -69,29 +70,7 @@ export default async function DashboardIndex() {
             <div className="mb-6">
               <Typography variant="body" level="h2" color="text-black">Information</Typography>
             </div>
-            <article
-              key={"error-post"}
-              className="flex flex-col flex-1 gap-6 overflow-hidden rounded-2xl p-4 pb-6 bg-white"
-            >
-              <header>
-                <h2 className="text-xl text-foreground font-sans font-semibold">
-                  Data kan inte läsas in
-                </h2>
-              </header>
-              <div
-                className="wp-post-content"
-              >
-                <p>Just nu kan data inte läsas in från Wordpress.</p>
-              </div>
-              <footer className="mt-auto pt-8">
-                <p className="text-sm text-foreground-1">
-                  Publicerat av Daniel, 27 november 2025
-                </p>
-              </footer>
-            </article>
-            {/* <Suspense fallback={<PostsLoading />}>
-              <InfoPosts data={posts} />
-            </Suspense> */}
+            <InfoPosts data={infoPosts} />
         </Section>
         </Main>
     </>
