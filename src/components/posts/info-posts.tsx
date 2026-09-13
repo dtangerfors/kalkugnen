@@ -42,38 +42,42 @@ export const InfoPosts = ({ data }: { data: InfoPost[] }) => {
 
 const PostTable = ({ table }: { table: InfoTable }) => {
   return (
-    <table className="relative w-full text-left text-sm text-foreground">
-      <thead>
-        <tr>
-          {table.head.map((heading) => (
-            <th key={heading} className="pb-2 font-bold">
-              {heading}
-            </th>
-          ))}
-        </tr>
-      </thead>
-      <tbody>
-        {table.rows.map((row, i) => (
-          <tr key={i} className="even:bg-gray-100">
-            {row.map((cell, j) => (
-              <td key={j} className="py-2 first:pl-2 last:pr-2">
-                {cell}
-              </td>
+    // Bleed the table to the card edges (card has p-4); cell padding keeps
+    // the text aligned with the rest of the card body.
+    <div className="-mx-4">
+      <table className="relative w-full text-left text-sm text-foreground">
+        <thead>
+          <tr>
+            {table.head.map((heading) => (
+              <th key={heading} className="px-2 pb-2 font-bold first:pl-4 last:pr-4">
+                {heading}
+              </th>
             ))}
           </tr>
-        ))}
-        {table.note && (
-          <tr>
-            <td
-              colSpan={table.head.length}
-              className="pt-6 text-sm text-foreground-1"
-            >
-              {table.note}
-            </td>
-          </tr>
-        )}
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          {table.rows.map((row, i) => (
+            <tr key={i} className="even:bg-gray-100">
+              {row.map((cell, j) => (
+                <td key={j} className="px-2 py-2 first:pl-4 last:pr-4">
+                  {cell}
+                </td>
+              ))}
+            </tr>
+          ))}
+          {table.note && (
+            <tr>
+              <td
+                colSpan={table.head.length}
+                className="px-4 pt-6 text-sm text-foreground-1"
+              >
+                {table.note}
+              </td>
+            </tr>
+          )}
+        </tbody>
+      </table>
+    </div>
   );
 };
 
