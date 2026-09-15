@@ -1,82 +1,68 @@
 "use server";
 
-import { Avatar } from "@prisma/client";
 import { sql } from "@vercel/postgres";
 import { z } from "zod";
 import { CompleteRegistrationFormValues } from "./types";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "./prisma";
 import { bookingDb } from "./booking-db";
 
-const AvatarSchema = z.object({
-  id: z.string(),
-  user_id: z.string(),
-  skinColor: z.string(),
-  earSize: z.string(),
-  hairColor: z.string(),
-  hairStyle: z.string(),
-  eyeStyle: z.string(),
-  noseStyle: z.string(),
-  mouthStyle: z.string(),
-  shirtStyle: z.string(),
-  shirtColor: z.string(),
-  bgColor: z.string(),
+// Mirrors the onboarding avatar schema so the allowed options stay in sync.
+const UpdateAvatarSchema = z.object({
+  skinColor: z.enum(["#F9C9B6", "#AC6651"]),
+  earSize: z.enum(["attached", "detached"]),
+  hairColor: z.enum(["#000", "#FFF", "#673D1D", "#F1E4CF", "#EDB06A"]),
+  hairStyle: z.enum(["fonze", "pixie", "danny", "full"]),
+  eyeStyle: z.enum(["eyes", "round", "smiling"]),
+  noseStyle: z.enum(["pointed", "curve", "round"]),
+  mouthStyle: z.enum(["laughing", "smile", "pucker"]),
+  shirtStyle: z.enum(["crew", "collared", "open"]),
+  shirtColor: z.enum(["#9EA576", "#71A4E9", "#DC87EB", "#E0B83F", "#E97171", "#E49953", "#99D04B", "#51BCDF"]),
+  bgColor: z.enum(["sun", "sky", "lilac", "poppy", "jaffa", "ivy", "water"]),
 });
 
-const CreateAvatar = AvatarSchema.omit({id: true});
-const UpdateAvatar = AvatarSchema.omit({user_id: true});
+export async function updateAvatar(formData: FormData) {
+  const { userId } = await auth();
 
-export async function createAvatar(data: Avatar) {
-  const {user_id, earSize, eyeStyle, hairColor, hairStyle, shirtColor, shirtStyle, noseStyle, mouthStyle, skinColor, bgColor} = CreateAvatar.parse({
-    user_id: data.user_id,
-    skinColor: data.skinColor,
-    earSize: data.earSize,
-    eyeStyle: data.eyeStyle,
-    noseStyle: data.noseStyle,
-    mouthStyle: data.mouthStyle,
-    hairColor: data.hairColor,
-    hairStyle: data.hairStyle,
-    shirtColor: data.shirtColor,
-    shirtStyle: data.shirtStyle,
-    bgColor: data.bgColor
+  if (!userId) {
+    return { error: "Ingen inloggad användare." };
+  }
+
+  const parsed = UpdateAvatarSchema.safeParse({
+    skinColor: formData.get("skinColor"),
+    earSize: formData.get("earSize"),
+    hairColor: formData.get("hairColor"),
+    hairStyle: formData.get("hairStyle"),
+    eyeStyle: formData.get("eyeStyle"),
+    noseStyle: formData.get("noseStyle"),
+    mouthStyle: formData.get("mouthStyle"),
+    shirtStyle: formData.get("shirtStyle"),
+    shirtColor: formData.get("shirtColor"),
+    bgColor: formData.get("bgColor"),
   });
 
-  await sql`
-    INSERT INTO Avatar (user_id, skinColor, earSize, eyeStyle, noseStyle, mouthStyle, hairColor, hairStyle, shirtColor, shirtStyle, bgColor)
-    VALUES (${user_id}, ${skinColor}, ${earSize}, ${eyeStyle}, ${noseStyle}, ${mouthStyle}, ${hairColor}, ${hairStyle}, ${shirtColor}, ${shirtStyle}, ${bgColor})    
-  `
-}
+  if (!parsed.success) {
+    return { error: "Ogiltiga avatarval." };
+  }
 
-export async function updateAvatar(data: Avatar) {
-  const {id, earSize, eyeStyle, hairColor, hairStyle, shirtColor, shirtStyle, noseStyle, mouthStyle, skinColor, bgColor} = UpdateAvatar.parse({
-    id: data.id,
-    skinColor: data.skinColor,
-    earSize: data.earSize,
-    eyeStyle: data.eyeStyle,
-    noseStyle: data.noseStyle,
-    mouthStyle: data.mouthStyle,
-    hairColor: data.hairColor,
-    hairStyle: data.hairStyle,
-    shirtColor: data.shirtColor,
-    shirtStyle: data.shirtStyle,
-    bgColor: data.bgColor
-  });
-
-  await sql`
-    UPDATE Avatar
-    SET 
-      skinColor = ${skinColor},
-      earSize = ${earSize},
-      eyeStyle = ${eyeStyle},
-      noseStyle = ${noseStyle},
-      mouthStyle = ${mouthStyle},
-      hairColor = ${hairColor},
-      hairStyle = ${hairStyle},
-      shirtColor = ${shirtColor},
-      shirtStyle = ${shirtStyle}
-      bgColor = ${bgColor}
-    WHERE id = ${id}
-`;
+  try {
+    // Update the avatar and keep AppUser.user_color in sync with bgColor,
+    // since onboarding sets them together and the calendar reads user_color.
+    await prisma.appUser.update({
+      where: { id: userId },
+      data: {
+        user_color: parsed.data.bgColor,
+        avatar: { update: parsed.data },
+      },
+    });
+    revalidatePath("/dashboard/profile");
+    return { message: "Avatar uppdaterad" };
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  } catch (error) {
+    return { error: "Kunde inte uppdatera avataren." };
+  }
 }
 
 const CreateUserSchema = z.object({
